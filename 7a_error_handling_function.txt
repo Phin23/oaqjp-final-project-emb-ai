@@ -18,19 +18,22 @@ def emotion_detector(text_to_analyse):
     
     response = requests.post(url, json=input_json, headers=headers)
     
+    # Check for status code 400 (bad request/blank entry) FIRST
+    if response.status_code == 400:
+        return {
+            'anger': None,
+            'disgust': None,
+            'fear': None,
+            'joy': None,
+            'sadness': None,
+            'dominant_emotion': None
+        }
+    
+    # Check if request was successful (status code 200)
     if response.status_code == 200:
         # Convert response text to dictionary
         formatted_response = json.loads(response.text)
-# Check for status code 400 (bad request/blank entry)
-if response.status_code == 400:
-    return {
-        'anger': None,
-        'disgust': None,
-        'fear': None,
-        'joy': None,
-        'sadness': None,
-        'dominant_emotion': None
-    }        
+        
         # Extract emotions from the response
         emotions = formatted_response['emotionPredictions'][0]['emotion']
         
@@ -61,12 +64,13 @@ if response.status_code == 400:
             'sadness': sadness_score,
             'dominant_emotion': dominant_emotion
         }
-    else:
-        return {
-            'anger': None,
-            'disgust': None,
-            'fear': None,
-            'joy': None,
-            'sadness': None,
-            'dominant_emotion': None
-        }
+    
+    # For any other status code, return None values
+    return {
+        'anger': None,
+        'disgust': None,
+        'fear': None,
+        'joy': None,
+        'sadness': None,
+        'dominant_emotion': None
+    }
